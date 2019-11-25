@@ -3,7 +3,7 @@ import time
 
 try:
   base_url = 'https://lambda-treasure-hunt.herokuapp.com/api'
-  token  = 'b998850f7eea4d86b11aa5894d59ecc8cafa888c'
+  token  = '<your token>'
 except:
   print("Please set both BASE_URL and TOKEN in env file")
 
