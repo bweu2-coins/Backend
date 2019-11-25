@@ -61,12 +61,12 @@ class Actions:
       print("Response returned:")
       print(response)
       return
-    self.last_proof = Proof(data.get('proof'), data.get('difficulty'), data.get('cooldown'), data.get('mesage'), data.get('errors'))
+    self.last_proof = Proof(data.get('proof'), data.get('difficulty'), data.get('cooldown'), data.get('messages'), data.get('errors'))
     timer = time.time() + float(data.get('cooldown'))
     cooldown = max(0, (timer - time.time())) + 0.01
     time.sleep(cooldown)
     print("Response:", data)
-    return data["proof"]
+    return data
 
 myself = Player()
 
