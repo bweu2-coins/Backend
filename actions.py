@@ -1,9 +1,12 @@
 import requests
+import time
+import random
 from proof import Proof
 from timeit import default_timer as timer
 import hashlib
+from player import Player
 
-base_url = '<base_url>'
+base_url = 'https://lambda-treasure-hunt.herokuapp.com/api'
 
 class Actions:
   def __init__(self, player):
@@ -20,7 +23,7 @@ class Actions:
 
     proof = 100000000
     while self.valid_proof(last_proof, proof, difficulty) is False:
-        proof -= 1
+        proof = random.getrandbits(32)
 
     print("Proof found: " + str(proof) + " in " + str(timer() - start))
     self.new_proof = proof 
@@ -32,17 +35,19 @@ class Actions:
 
 
   def mine(self, new_proof):
+    x = int(new_proof)
     response = response = requests.post(self.base_url + '/bc/mine/',
-                                 headers={'Authorization': self.player.token}, json={'proof': int(new_proof)})
-
+                              headers={'Authorization': self.player.token}, json={'proof': new_proof})
     try:
       data = response.json()
+      time.sleep(data["cooldown"])
+      return data
     except ValueError:
       print("Error: Non-json response")
       print("Response returned:")
       print(response)
       return
-    # cooldown player, apply the cool down script
+    #cooldown =  max(0, ())
     print("Response:", data)
 
   def get_last_proof(self):
@@ -51,10 +56,34 @@ class Actions:
     try:
       data = response.json()
     except ValueError:
+      print(self.player.token)
       print("Error: Non-json response")
       print("Response returned:")
       print(response)
       return
-    # cooldown player, apply the cool down script
     self.last_proof = Proof(data.get('proof'), data.get('difficulty'), data.get('cooldown'), data.get('mesage'), data.get('errors'))
+    timer = time.time() + float(data.get('cooldown'))
+    cooldown = max(0, (timer - time.time())) + 0.01
+    time.sleep(cooldown)
     print("Response:", data)
+    return data["proof"]
+
+myself = Player()
+
+action = Actions(myself)
+
+
+while True:
+        # Get the last proof from the server
+        
+        last_proof = action.get_last_proof()
+        print(last_proof)
+        action.proof_work(last_proof, 6)
+        coin = action.mine(action.new_proof)
+        print(coin)
+        # if data.get('message') == 'New Block Forged':
+        #     coins_mined += 1
+        #     print("Total coins mined: " + str(coins_mined))
+        # else:
+        #     print(data.get('message'))
+
