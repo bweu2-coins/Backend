@@ -70,6 +70,6 @@ while current_room["room_id"] != 397: ## change to whatever room you searching f
         counter += 1 
         time.sleep(current_room["cooldown"])
         new_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/move/', json={'direction': f'{direction}',
-        "next_room_id": f'{route_to_shop[counter]}'}, headers={'Authorization': 'Token b998850f7eea4d86b11aa5894d59ecc8cafa888c'}).json()
+        "next_room_id": f'{route_to_shop[counter]}'}, headers={'Authorization': 'Token <your token>'}).json()
         current_room = new_room
         print(current_room)
