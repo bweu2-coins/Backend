@@ -66,7 +66,7 @@ class Actions:
     cooldown = max(0, (timer - time.time())) + 0.01
     time.sleep(cooldown)
     print("Response:", data)
-    return data
+    return data['proof']
 
 myself = Player()
 
