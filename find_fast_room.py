@@ -25,7 +25,7 @@ class Queue():
 current_room = requests.get(
 ' https://lambda-treasure-hunt.herokuapp.com/api/adv/init/',
 headers={
-'Authorization': 'Token b998850f7eea4d86b11aa5894d59ecc8cafa888c'},
+'Authorization': 'Token <your token>'},
 ).json()
 
 def bfs():
@@ -73,3 +73,12 @@ while current_room["room_id"] != 397: ## change to whatever room you searching f
         "next_room_id": f'{route_to_shop[counter]}'}, headers={'Authorization': 'Token <your token>'}).json()
         current_room = new_room
         print(current_room)
+
+        while current_room["items"] != []:
+            time.sleep(current_room["cooldown"])
+            check_inventory = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/status/', json={"name":"treasure"}, headers={'Authorization': 'Token <your token>'}).json()
+            print(check_inventory)
+            if check_inventory["strength"] > check_inventory["encumbrance"]:
+                time.sleep(current_room["cooldown"])
+                updated_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/take/', json={"name":"treasure"}, headers={'Authorization': 'Token <your token>'}).json()
+                current_room = updated_room
