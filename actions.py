@@ -76,7 +76,6 @@ action = Actions(myself)
 
 while True:
     # Get the last proof from the server
-
     last_proof = action.get_last_proof()
     action.proof_work(last_proof['proof'], last_proof['difficulty'])
     coin = action.mine(action.new_proof)
