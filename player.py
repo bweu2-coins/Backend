@@ -1,9 +1,12 @@
 import requests
 import time
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 try:
   base_url = 'https://lambda-treasure-hunt.herokuapp.com/api'
-  token  = '<your token>'
+  token  = os.getenv('token')
 except:
   print("Please set both BASE_URL and TOKEN in env file")
 

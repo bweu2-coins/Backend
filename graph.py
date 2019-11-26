@@ -2,12 +2,17 @@ import json
 import random
 import requests
 import time
+import os
 from util import Stack, Queue
+
+from dotenv import load_dotenv
+load_dotenv()
 
 grid_with_all_info = {}
 
 direction_reversed = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
 
+token  = os.getenv('token')
 class Graph:
 
     def __init__(self):
@@ -43,7 +48,7 @@ class Graph:
                     if self.vertices[self.current_room["room_id"]][direction] == "?":
                         time.sleep(self.current_room["cooldown"])
                         new_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/move/', json={
-                        'direction': f'{direction}'}, headers={'Authorization': 'Token <your token>'}).json()
+                        'direction': f'{direction}'}, headers={'Authorization': 'Token ' + token}).json()
                         self.vertices[self.last_room][direction] = new_room["room_id"]
                         last_direction = direction
                         s.push(new_room["room_id"])
@@ -53,11 +58,11 @@ class Graph:
 
                         while self.current_room["items"] != []:
                           time.sleep(self.current_room["cooldown"])
-                          check_inventory = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/status/', json={"name":"treasure"}, headers={'Authorization': 'Token <your token>'}).json()
+                          check_inventory = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/status/', json={"name":"treasure"}, headers={'Authorization': 'Token ' + token}).json()
                           print(check_inventory)
                           if check_inventory["strength"] > check_inventory["encumbrance"]:
                               time.sleep(self.current_room["cooldown"])
-                              updated_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/take/', json={"name":"treasure"}, headers={'Authorization': 'Token <your token>'}).json()
+                              updated_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/take/', json={"name":"treasure"}, headers={'Authorization': 'Token ' + token}).json()
                               self.current_room = updated_room
                               print(updated_room)
                         break
@@ -85,7 +90,7 @@ class Graph:
         response = requests.get(
             ' https://lambda-treasure-hunt.herokuapp.com/api/adv/init/',
             headers={
-                'Authorization': 'Token <your token>'},
+                'Authorization': 'Token ' + token},
         )
 
         json_response = response.json()
@@ -103,7 +108,7 @@ class Graph:
                     if self.vertices[self.current_room["room_id"]][direction] == room:
                         time.sleep(self.current_room["cooldown"])
                         new_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/move/', json={'direction': f'{direction}',
-                        "next_room_id": f'{room}'}, headers={'Authorization': 'Token <your token>'}).json()
+                        "next_room_id": f'{room}'}, headers={'Authorization': 'Token ' + token}).json()
                         self.current_room = new_room
                         break
 
