@@ -6,13 +6,16 @@ import os
 from util import Stack, Queue
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 grid_with_all_info = {}
 
 direction_reversed = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
 
-token  = os.getenv('token')
+token = os.getenv('token')
+
+
 class Graph:
 
     def __init__(self):
@@ -32,10 +35,10 @@ class Graph:
                 self.vertices[self.current_room["room_id"]] = {}
                 for direction in self.current_room["exits"]:
                     self.vertices[self.current_room["room_id"]
-                                  ][direction] = "?"
+                    ][direction] = "?"
             if last_direction:
                 self.vertices[self.current_room["room_id"]
-                              ][direction_reversed[last_direction]] = self.last_room
+                ][direction_reversed[last_direction]] = self.last_room
 
             self.last_room = self.current_room["room_id"]
             v = s.pop()
@@ -48,7 +51,7 @@ class Graph:
                     if self.vertices[self.current_room["room_id"]][direction] == "?":
                         time.sleep(self.current_room["cooldown"])
                         new_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/move/', json={
-                        'direction': f'{direction}'}, headers={'Authorization': 'Token ' + token}).json()
+                            'direction': f'{direction}'}, headers={'Authorization': 'Token ' + token}).json()
                         self.vertices[self.last_room][direction] = new_room["room_id"]
                         last_direction = direction
                         s.push(new_room["room_id"])
@@ -57,14 +60,18 @@ class Graph:
                         print(self.current_room)
 
                         while self.current_room["items"] != []:
-                          time.sleep(self.current_room["cooldown"])
-                          check_inventory = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/status/', json={"name":"treasure"}, headers={'Authorization': 'Token ' + token}).json()
-                          print(check_inventory)
-                          if check_inventory["strength"] > check_inventory["encumbrance"]:
-                              time.sleep(self.current_room["cooldown"])
-                              updated_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/take/', json={"name":"treasure"}, headers={'Authorization': 'Token ' + token}).json()
-                              self.current_room = updated_room
-                              print(updated_room)
+                            time.sleep(self.current_room["cooldown"])
+                            check_inventory = requests.post(
+                                'https://lambda-treasure-hunt.herokuapp.com/api/adv/status/', json={"name": "treasure"},
+                                headers={'Authorization': 'Token ' + token}).json()
+                            print(check_inventory)
+                            if check_inventory["strength"] > check_inventory["encumbrance"]:
+                                time.sleep(self.current_room["cooldown"])
+                                updated_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/take/',
+                                                             json={"name": "treasure"},
+                                                             headers={'Authorization': 'Token ' + token}).json()
+                                self.current_room = updated_room
+                                print(updated_room)
                         break
                     break
 
@@ -107,10 +114,13 @@ class Graph:
                 for direction in grid_with_all_info[self.current_room["room_id"]]["exits"]:
                     if self.vertices[self.current_room["room_id"]][direction] == room:
                         time.sleep(self.current_room["cooldown"])
-                        new_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/move/', json={'direction': f'{direction}',
-                        "next_room_id": f'{room}'}, headers={'Authorization': 'Token ' + token}).json()
+                        new_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/move/',
+                                                 json={'direction': f'{direction}',
+                                                       "next_room_id": f'{room}'},
+                                                 headers={'Authorization': 'Token ' + token}).json()
                         self.current_room = new_room
                         break
+
 
 graph = Graph()
 graph.traverse()
@@ -121,9 +131,6 @@ with open('grid_with_all_infos.txt', 'w') as outfile:
 with open('grid_with_all_directionss.txt', 'w') as outfile:
     json.dump(graph.vertices, outfile)
 
-
-    
     # while self.current_room["items"] != [] :
     # updated_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/take/', json={"name":"treasure"}, headers={'Authorization': 'Token <your token>'})
     # time.sleep(20)
-    
