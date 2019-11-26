@@ -66,7 +66,7 @@ class Actions:
     cooldown = max(0, (timer - time.time())) + 0.01
     time.sleep(cooldown)
     print("Response:", data)
-    return data['proof']
+    return data
 
 myself = Player()
 
@@ -75,10 +75,11 @@ action = Actions(myself)
 
 while True:
         # Get the last proof from the server
-        
-        last_proof = action.get_last_proof()
-        print(last_proof)
-        action.proof_work(last_proof, 6)
+
+        last_proof = action.get_last_proof()['proof']
+        difficulty = action.get_last_proof()['difficulty']
+
+        action.proof_work(last_proof, difficulty)
         coin = action.mine(action.new_proof)
         print(coin)
         # if data.get('message') == 'New Block Forged':
